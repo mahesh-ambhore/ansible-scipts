@@ -1,0 +1,11 @@
+---
+# tasks file for javasetup
+
+
+    - name: Installing java(jdk)  CentOS
+      yum: pkg=java-1.7.0-openjdk state=latest
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+    - name: Installing java(jdk)  Ubuntu
+      apt: pkg=openjdk-7-jre-headless state=present 
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

@@ -1,0 +1,23 @@
+---
+
+- name: add ppa
+  apt_repository: repo='ppa:ondrej/php' state=present
+  tags:
+    - php
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add epel repository
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm"
+    state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  tags:
+    - add_repo
+
+- name: Add Webtatic EL yum repository
+  yum:
+    name: "https://mirror.webtatic.com/yum/el6/latest.rpm"
+    state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  tags:
+    - add_repo

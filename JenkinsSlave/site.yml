@@ -1,0 +1,24 @@
+- hosts: all
+  become: yes
+  
+
+  vars:
+    - apt_file: /etc/apt/sources.list.d/google-chrome.list
+
+  vars_prompt:
+    - name: "php_version"
+      prompt: "which php version you want to install??\n1- PHP5 or PHP5.5\n2- PHP5.6\n3- PHP7.0\n4- PHP7.1\n"
+      private: no
+      when: confirm == "1"
+
+  pre_tasks:
+
+  roles:
+
+   # - { role: git }
+  #  - { role: apache}
+    - { role: php5, when: php_version == "1"}
+    - { role: php56, when: php_version == "2"}
+    - { role: php70, when: php_version == "3"}
+    - { role: php71, when: php_version == "4"}
+   # - { role: code_analysis_tools}

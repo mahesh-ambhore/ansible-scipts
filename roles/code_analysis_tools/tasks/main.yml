@@ -1,0 +1,84 @@
+---
+- name: Install phpcpd
+  get_url: 
+    url: https://phar.phpunit.de/phpcpd.phar
+    dest: /usr/local/bin/phpcpd
+    mode: 0755
+  tags:
+    - phpcpd
+
+- name: Install deployer
+  shell: cd /home && wget http://deployer.org/releases/v3.3.0/deployer.phar && mv /home/deployer.phar /usr/local/bin/dep && chmod +x /usr/local/bin/dep
+  tags:
+    - deployer
+
+- name: Install phpcb
+  shell: cd /home && wget https://github.com/mayflower/PHP_CodeBrowser/releases/download/1.1.1/phpcb-1.1.1.phar && mv /home/phpcb-1.1.1.phar /usr/local/bin/phpcb && chmod +x /usr/local/bin/phpcb
+  tags:
+    - phpcb
+
+- name: Install phpmd
+  shell: cd /home && wget -c http://static.phpmd.org/php/latest/phpmd.phar && mv /home/phpmd.phar /usr/local/bin/phpmd && chmod +x /usr/local/bin/phpmd
+  tags:
+    - phpmd
+
+- name: Install phpunit
+  get_url:
+    url: https://phar.phpunit.de/phpunit-4.8.phar
+    dest: /usr/local/bin/phpunit
+    mode: 0755
+  tags:
+      - phpunit
+
+- name: Install phpcs
+  get_url:
+    url: https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.7.1/phpcs.phar
+    dest: /usr/local/bin/phpcs
+    mode: 0755
+  tags:
+    - phpcs
+
+- name: Install symfony2 coding standards
+  git:
+    repo: git://github.com/djoos/Symfony2-coding-standard.git
+    dest: /usr/local/bin/standards/symfony
+    clone: yes
+  tags:
+    - symfony2
+
+- name: Install drupal coding standards
+  git:
+    repo: https://github.com/klausi/coder
+    dest: /usr/local/bin/standards/drupal
+    clone: yes
+  tags:
+    - drupal
+
+- name: Install magento coding standards
+  git:
+    repo: https://github.com/magento-ecg/coding-standard
+    dest: /usr/local/bin/standards/magento
+    clone: yes
+  tags:
+    - magento
+
+- name: Install wordpress coding standards
+  git:
+    repo: https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git
+    dest: /usr/local/bin/standards/WordPress-Coding-Standards
+    clone: yes
+  tags:
+    - wordpress
+
+- name: Add standard to the PHP_CodeSniffer
+  shell: phpcs --config-set installed_paths  /usr/local/bin/standards/symfony,/usr/local/bin/standards/drupal/coder_sniffer,/usr/local/bin/standards/magento,/usr/local/bin/standards/WordPress-Coding-Standards
+  tags:
+    - symfony2drupal-add-config
+
+- name: Installing ANT  CentOS
+  yum: pkg=ant state=latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Installing ANT  Ubuntu
+  apt: pkg=ant state=present 
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

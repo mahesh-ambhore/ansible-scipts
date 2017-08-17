@@ -1,0 +1,44 @@
+---
+- hosts: all 
+  gather_facts: True
+
+  vars_prompt:
+    - name: "php_version"
+      prompt: "which php version you want to install??\n1- PHP5 or PHP5.5\n2- PHP5.6\n3- PHP7.0\n4- PHP7.1\n"
+      private: no
+
+  pre_tasks:
+
+  - name: Check user entered given php version or not 
+    fail: msg="Please enter correct option to install php."
+    when: php_version > "5"
+
+  roles:
+    - { role: apache }
+    - { role: mysql }
+    - { role: php5, when: php_version == "1" }
+    - { role: php56, when: php_version == "2" }
+    - { role: php70, when: php_version == "3" }
+    - { role: php71, when: php_version == "4" }
+ 
+  post_tasks:
+  - name: create phpinfo.php
+    file: path=/var/www/html/phpinfo.php state=touch
+    tags:
+      - phpinfo
+
+  - name: copy content to file ubuntu
+    copy: content="<?php phpinfo(); ?>" dest=/var/www/html/phpinfo.php
+    notify:
+      - restart apache
+    tags:
+      - phpinfo
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: copy content to file centos
+    copy: content="<?php phpinfo(); ?>" dest=/var/www/html/phpinfo.php
+    notify:
+      - restart httpd
+    tags:
+      - phpinfo
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

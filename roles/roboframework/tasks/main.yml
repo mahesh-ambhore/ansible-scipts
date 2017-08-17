@@ -1,0 +1,75 @@
+---
+
+    - debug: msg="=============Not installing Robot in centos=============="
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux')
+    
+    - name: End of script on centos after selectiong robot
+      meta: end_play
+      when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux')
+
+    - name: Does the Google apt file exist on ubuntu?
+      command: test -f {{apt_file}}
+      register: google_apt_exists
+      ignore_errors: True
+      when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+      tags:
+        - chrome
+
+    - name: Add Google Chrome key on ubuntu
+      shell: wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+      when:  ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' 
+      tags:
+        - chrome
+
+    - name: Add Google Chrome repo on ubuntu
+      copy: content="deb http://dl.google.com/linux/chrome/deb/ stable main" dest={{apt_file}} owner=root group=root mode=644
+      when:  (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+      tags:
+        - chrome
+
+    - name: Install Google Chrome on ubuntu
+      apt: pkg=google-chrome-stable state=installed update_cache=yes cache_valid_time=86400
+      when:  (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+    - name: Install Firefox on ubuntu
+      apt: pkg=firefox state=latest update_cache=yes cache_valid_time=86400
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    
+    - name: add sudo on ubuntu
+      shell: apt-get install sudo
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    
+    - name: Install wget Ubuntu
+      apt: pkg=wget state=latest update_cache=true cache_valid_time=86400
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Install wget Centos
+      yum: pkg=wget state=latest update_cache=true cache_valid_time=86400
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+    - name: Installing software properties common for pip on ubuntu
+      apt: name=software-properties-common state=latest
+      when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+    - name: Installing python pip ubuntu
+      apt: name=python-pip state=latest
+      when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+    - name: Installing python pip on  CentOS
+      yum: pkg=python-pip state=latest
+      when:  (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux')
+
+    - name: update python pip on ubuntu
+      shell: pip install --upgrade pip
+      when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+    - name: Create directory for Application
+      file: path=/home/requests state=directory
+       
+    - copy:
+        src: requirement.txt
+        dest: /home/requests/
+        mode: "u+rw,g-wx,o-rwx"
+
+    - name: Install robotframework on ubuntu
+      shell: pip install -r /home/requests/requirement.txt

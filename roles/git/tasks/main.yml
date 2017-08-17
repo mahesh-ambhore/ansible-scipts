@@ -1,0 +1,12 @@
+---
+- name: install git on ubuntu
+  apt: pkg=git state=latest update_cache=true  cache_valid_time=86400
+  tags:
+    - git
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install git on Centos
+  yum: pkg=git state=latest update_cache=true
+  tags:
+    - git
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

@@ -1,0 +1,95 @@
+---
+
+## install virtual box on ubuntu
+  - name: Download virtualbox on ubuntu
+    get_url:
+      url: http://download.virtualbox.org/virtualbox/5.1.22/virtualbox-5.1_5.1.22-115126~Ubuntu~trusty_amd64.deb
+      dest: /home
+      mode: 0755
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    become: true
+    become_user: root
+    ignore_errors: true
+
+  - name: Install my_package
+    apt: deb="/home/virtualbox-5.1_5.1.22-115126~Ubuntu~trusty_amd64.deb"
+    sudo: true
+ 
+  #- name: Installing virtualbox on ubuntu
+   # shell: dpkg -i /home/virtualbox-5.1_5.1.22-115126~Ubuntu~trusty_amd64.deb
+    #when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+   # become: true
+    #become_user: root
+    #become_method: sudo
+
+### install vagrant on ubuntu
+
+  - name: Download vagrant on ubuntu
+    get_url:
+      url: https://releases.hashicorp.com/vagrant/1.9.4/vagrant_1.9.4_x86_64.deb
+      dest: /home
+
+  - name: Install my_package
+    apt: deb="/home/vagrant_1.9.4_x86_64.deb"
+    sudo: true
+
+
+  #- name: Installing vagrant on ubuntu
+   # shell: dpkg -i /home/vagrant_1.9.4_x86_64.deb
+   # when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+   # become: true
+   # become_user: root
+
+### install virtual box on centos
+
+
+  - name: updating
+    shell: yum -y update
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true
+    ignore_errors: true
+
+  - name: get virtual box repo 
+    shell: cd /etc/yum.repos.d/ && wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo 
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true
+
+  - name: required packages to run VirtualBox on centos
+    yum: name={{item}} state=present 
+    with_items:
+       - binutils
+       - qt
+       - gcc
+       - make
+       - patch
+       - libgomp
+       - glibc-headers
+       - glibc-devel
+       - kernel-headers
+       - kernel-devel
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true
+
+  - name: set up environment veriable for  virtualbox on centos
+    shell: export KERN_DIR=/usr/src/kernels/2.6.32-504.3.3.el6.x86_64
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true
+
+  - name: get virtualbox package for centos
+    shell: yum -y install VirtualBox-5.1
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true
+
+  - name: install vagrant centos
+    shell: cd ~ &&  yum -y remove vagrant_1.8.1_x86_64.rpm
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true
+    ignore_errors: true
+
+
+  - name: nstall vagrant centos
+    yum:
+      name: "https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm"
+      state: present
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+    become: true

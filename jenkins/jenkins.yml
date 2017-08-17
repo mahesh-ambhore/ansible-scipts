@@ -1,0 +1,58 @@
+---
+- hosts: all
+  gather_facts: true
+  become: true
+  
+  vars_prompt:
+    - name: "jenkins_backup"
+      prompt: "Enter full path or url for jenkins backup tar file."
+      private: no
+      default: jenkins_backup.tar.gz
+
+  pre_tasks:
+
+  - name: Install wget Ubuntu
+    apt: pkg=wget state=latest update_cache=true cache_valid_time=86400
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: Install wget Centos
+    yum: pkg=wget state=latest update_cache=true
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  roles:
+    - { role: java }
+    - { role: jenkins }
+    - { role: php56 }
+    - { role: git }
+    - { role: code_analysis_tools }
+
+  post_tasks:
+  - name: stop jenkins server
+    service: name=jenkins state=stopped
+
+  #- name: restore backup remote_src
+   # unarchive:
+    #  src: "{{ jenkins_backup }}"
+     # dest: /home
+      #remote_src: true
+    #tags:
+     # - restore_backup
+    #when: jenkins_backup | search("https") or jenkins_backup | search("http")
+
+  #- name: restore backup physical path
+   # unarchive:
+    #  src: "{{ jenkins_backup }}"
+     # dest: /home
+    #tags:
+     # - restore_backup
+    #when: jenkins_backup | is_dir or jenkins_backup | is_file
+
+  #- name: restore jenkins backup
+   # shell: cd /home/jenkins-backup && cp -R . /var/lib/jenkins/ && chown jenkins:jenkins -R /var/lib/jenkins && rm -rf /home/jenkins-backup
+    #tags:
+     # - restore_backup
+
+  - name: start jenkins server
+    service: name=jenkins state=started
+    tags:
+      - start_server

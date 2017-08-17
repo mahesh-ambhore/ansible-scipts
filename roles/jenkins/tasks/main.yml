@@ -1,0 +1,24 @@
+---
+- name: wget jenkins Ubuntu
+  shell: wget --no-check-certificate -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | apt-key add -
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: wget jenkins Centos
+  shell: wget -O /etc/yum.repos.d/jenkins.repo   http://jenkins-ci.org/redhat/jenkins.repo
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Ubuntu add repo
+  shell: sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Centos add repo
+  shell: rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install jenkins Ubuntu
+  apt: pkg=jenkins state=latest update_cache=true  cache_valid_time=86400
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install jenkins Centos
+  yum: pkg=jenkins state=latest update_cache=true
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'   

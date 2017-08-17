@@ -1,0 +1,4 @@
+[ubuntu]
+insane_fermi ansible_connection=docker
+
+

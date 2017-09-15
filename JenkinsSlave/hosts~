@@ -1,3 +1,0 @@
-[ubuntu]
-host1 ansible_host=127.0.0.1 ansible_user=vagrant  ansible_port=2200
-#my-container-test-one ansible_connection=docker
